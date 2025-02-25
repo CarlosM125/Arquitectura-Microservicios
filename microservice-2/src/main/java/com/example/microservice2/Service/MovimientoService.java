@@ -21,11 +21,9 @@ public class MovimientoService {
 
     @Transactional
     public Movimiento registrarMovimiento(Integer numeroCuenta, String tipoMovimiento, Double valor) {
-        // 1️⃣ Verificar que la Cuenta existe
         Cuenta cuenta = cuentaRepository.findById(numeroCuenta)
                 .orElseThrow(() -> new RuntimeException("Cuenta no encontrada"));
 
-        // 2️⃣ Validar saldo para retiros
         Double nuevoSaldo = cuenta.getSaldoInicial();
         if (tipoMovimiento.equalsIgnoreCase("Retiro")) {
             if (nuevoSaldo < valor) {
@@ -38,7 +36,6 @@ public class MovimientoService {
             throw new IllegalArgumentException("Tipo de movimiento inválido");
         }
 
-        // 3️⃣ Guardar el Movimiento
         Movimiento movimiento = Movimiento.builder()
                 .cuenta(cuenta)
                 .fecha(LocalDateTime.now())
@@ -49,7 +46,6 @@ public class MovimientoService {
 
         movimientoRepository.save(movimiento);
 
-        // 4️⃣ Actualizar el saldo de la cuenta
         cuenta.setSaldoInicial(nuevoSaldo);
         cuentaRepository.save(cuenta);
 
