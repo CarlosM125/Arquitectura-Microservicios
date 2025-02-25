@@ -20,11 +20,9 @@ public class ClienteService {
 
     @Transactional
     public Cliente guardarCliente(Integer personaId, String password, Boolean estado) {
-        // 1️⃣ Verifica que la Persona existe en la BD antes de crear el Cliente
         Persona personaExistente = personaRepository.findById(personaId)
                 .orElseThrow(() -> new RuntimeException("Persona no encontrada con ID: " + personaId));
 
-        // 2️⃣ Crear y guardar el Cliente asociado a la Persona
         Cliente cliente = Cliente.builder()
                 .persona(personaExistente)
                 .password(password)
