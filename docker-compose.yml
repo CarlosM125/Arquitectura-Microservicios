@@ -1,0 +1,68 @@
+version: "3.8"
+
+services:
+  # 📌 Base de datos PostgreSQL
+  postgres:
+    image: postgres:latest
+    container_name: postgres-bancodb
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: BancoDB
+    ports:
+      - "5432:5432"
+    networks:
+      - microservices-net
+    restart: always
+
+  # 📌 RabbitMQ (Mensajería)
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672" # Puerto para comunicación con microservicios
+      - "15672:15672" # UI para monitoreo en http://localhost:15672
+    networks:
+      - microservices-net
+    restart: always
+
+  # 📌 Microservicio Cliente-Persona
+  microservicio-cliente:
+    build: ./microservice-1
+    container_name: microservicio-cliente
+    depends_on:
+      - postgres
+      - rabbitmq
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/BancoDB
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_RABBITMQ_HOST: rabbitmq
+    ports:
+      - "8081:8081"
+    networks:
+      - microservices-net
+    restart: always
+
+  # 📌 Microservicio Cuenta-Movimientos
+  microservicio-cuenta:
+    build: ./microservice-2
+    container_name: microservicio-cuenta
+    depends_on:
+      - postgres
+      - rabbitmq
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/BancoDB
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_RABBITMQ_HOST: rabbitmq
+    ports:
+      - "8082:8082"
+    networks:
+      - microservices-net
+    restart: always
+
+# 📌 Red para comunicación entre microservicios
+networks:
+  microservices-net:
+    driver: bridge
