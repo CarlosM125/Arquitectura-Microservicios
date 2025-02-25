@@ -41,7 +41,6 @@ public class CuentaService {
             throw new RuntimeException("Cliente no encontrado en el Microservicio 1");
         }
 
-        // 2️⃣ Crear la Cuenta si el Cliente existe
         Cuenta cuenta = Cuenta.builder()
                 .clienteId(clienteId)
                 .tipoCuenta(tipoCuenta)
